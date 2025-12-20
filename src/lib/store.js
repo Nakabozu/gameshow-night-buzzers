@@ -29,7 +29,7 @@ export const ansiR = "\x1b[00m";
 /** @type {{name: string, buzz: number, isClaimed: boolean }[]} */
 export const players = writable([]);
 /**
- * @type {import("svelte/store").Writable<'names' | 'buzzer'>}
+ * @type {import("svelte/store").Writable<'gameid' | 'names' | 'buzzer'>}
  *
  * The page that's open.
  *
@@ -37,6 +37,6 @@ export const players = writable([]);
  * - `question` shows the a question from the board
  * - `answer` shows the answer to the question
  */
-export const page = writable("names");
+export const page = writable("gameid");
 /** @type {import("svelte/store").Writable<string>} */
 export const name = writable("");

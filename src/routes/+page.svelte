@@ -1,5 +1,6 @@
 <script>
     import { name, page, players, socket } from "$lib/store";
+    let gameId = -1;
     let buzz = 0;
 
     const onSelectPlayer = (selectedPlayer) => {
@@ -16,10 +17,6 @@
 
     socket.on("connect", () => {
         console.log("YOU CONNECTED TO THE FRONTEND! :D");
-    });
-
-    socket.on("welcome", (initialPlayers) => {
-        $players = initialPlayers;
     });
 
     socket.on("client_unbuzzes_all", () => {
@@ -58,15 +55,38 @@
         $page = "names";
     });
 
+    const setGameId = () => {
+        socket.emit("client_joins_game", gameId, (newPlayers) => {
+            if (newPlayers?.error) {
+                console.warn("NO PLAYERS FOR THIS GAME");
+                return;
+            }
+            console.log("You joined the room!", newPlayers);
+            $page = "names";
+            $players = newPlayers;
+        });
+    };
+
     const onBuzz = () => {
-        socket.emit("client_buzzes_in", $name, () => {
+        socket.emit("client_buzzes_in", () => {
             console.log("\x1b[32mYou buzzed in!\x1b[00m");
         });
     };
 </script>
 
+<svelte:head>
+    <title>Buzz in!</title>
+    <meta name="description" content="Buzzers for Game Show Night with Naka!" />
+</svelte:head>
+
 <main>
-    {#if $page === "names"}
+    {#if $page === "gameid"}
+        <div class="game-id-container">
+            <label for="input-game-id">Game Id</label>
+            <input id="input-game-id" bind:value={gameId} />
+            <button on:click={setGameId}>Submit</button>
+        </div>
+    {:else if $page === "names"}
         {#if $players?.length === undefined || $players?.length <= 0}
             <h1>Hold tight while things are set up</h1>
         {:else}
@@ -130,6 +150,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        font-family: sans-serif;
     }
     h1 {
         font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
@@ -157,6 +178,20 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+    }
+    .game-id-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5%;
+    }
+    label {
+        font-size: 10vw;
+    }
+    input {
+        width: 80%;
+        font-size: 8vw;
     }
     .players-container {
         width: 100%;
