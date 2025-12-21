@@ -68,6 +68,7 @@
     };
 
     const onBuzz = () => {
+        if (buzz > 0) return;
         socket.emit("client_buzzes_in", () => {
             console.log("\x1b[32mYou buzzed in!\x1b[00m");
         });
